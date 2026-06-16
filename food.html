@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>food</title>
+</head>
+<body>
+    <div class="fdCo">
+        <h1>What are we feeling? 🍛✨</h1>
+        <div class="select" id="foodOptions">
+            <div class="option" data-food="Pizza">
+                <p>🍕</p>
+                <p>Pizza</p>
+            </div>
+
+            <div class="option" data-food="Sushi">
+                <p>🍣</p>
+                <p>Sushi</p>
+            </div>
+
+            <div class="option" data-food="Burgers">
+                <p>🍔</p>
+                <p>Burgers</p>
+            </div>
+
+            <div class="option" data-food="Pasta">
+                <p>🍝</p>
+                <p>Pasta</p>
+            </div>
+
+            <div class="option" data-food="Tacos">
+                <p>🌮</p>
+                <p>Tacos</p>
+            </div>
+
+            <div class="option" data-food="Ramen">
+                <p>🍜</p>
+                <p>Ramen</p>
+            </div>
+        </div>
+        <button id="ths">this one! -></button>
+    </div>
+
+    <script>
+        let selectedFood = null;
+
+        // Add click listeners to food options
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selection from all options
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.style.border = '3px solid transparent';
+                });
+                // Highlight selected option
+                this.style.border = '3px solid #E69FB4';
+                selectedFood = this.dataset.food;
+            });
+        });
+
+        document.getElementById("ths").addEventListener("click", function() {
+            if (!selectedFood) {
+                alert("Please select a food option first!");
+                return;
+            }
+            
+            // Store food choice in localStorage
+            localStorage.setItem("food", selectedFood);
+            
+            // Navigate to final page
+            window.location.href = "final.html";
+        });
+    </script>
+</body>
+</html>

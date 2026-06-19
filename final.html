@@ -1,314 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>final · responsive</title>
-    <!-- all styles (including responsive) at head -->
-    <style>
-        /* ----- reset & base ----- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>popup · confetti · final</title>
+  <!-- canvas confetti library (lightweight) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem;
-            background-color: #fcd7d7; /* fallback */
-            background-image: url('./assets/petals2.gif');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      background-color: #fcd7d7;
+      background-image: url('./assets/petals2.gif');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      position: relative;
+    }
 
-        /* pseudo overlay – subtle */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-color: rgba(252, 173, 173, 0.3);
-            backdrop-filter: blur(1px);
-            -webkit-backdrop-filter: blur(1px);
-        }
+    /* subtle overlay (kept for atmosphere) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-color: rgba(252, 173, 173, 0.25);
+      backdrop-filter: blur(1px);
+      -webkit-backdrop-filter: blur(1px);
+    }
 
-        /* ----- shared card style ----- */
-        .finCo {
-            background-color: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            padding: 2rem 1.8rem;
-            border-radius: 2.5rem;
-            max-width: 600px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            color: #492230;
-            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2);
-            transition: all 0.2s ease;
-            margin: 0 auto;
-            min-height: auto;
-            height: auto;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+    /* ---- POPUP MODAL (final container) ---- */
+    .popup-modal {
+      position: relative;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding: 2rem 1.8rem;
+      border-radius: 2.8rem;
+      max-width: 640px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: #492230;
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 220, 230, 0.6);
+      margin: 0 auto;
+      transition: transform 0.25s ease, opacity 0.3s ease;
+      animation: modalPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
-        /* image */
-        .shr {
-            width: 180px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-bottom: 1.2rem;
-            box-shadow: 0 8px 24px rgba(73, 34, 48, 0.15);
-            flex-shrink: 0;
-        }
+    @keyframes modalPop {
+      0% { transform: scale(0.85) translateY(20px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
 
-        /* heading */
-        .finCo h1 {
-            font-size: 1.6rem;
-            line-height: 1.3;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            margin-bottom: 1rem;
-            word-break: break-word;
-            color: #3a1b2a;
-        }
+    .shr {
+      width: 170px;
+      height: 170px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 28px rgba(73, 34, 48, 0.2);
+      flex-shrink: 0;
+      border: 3px solid rgba(255, 255, 255, 0.6);
+    }
 
-        /* shakespeare-style P */
-        .finCo p {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #4d3642;
-            background: rgba(255, 240, 245, 0.4);
-            padding: 1.2rem 1.2rem;
-            border-radius: 2rem;
-            font-style: italic;
-            margin-top: 0.5rem;
-            border-left: 4px solid #e69fb4;
-            text-align: left;
-            width: 100%;
-            max-width: 100%;
-            word-break: break-word;
-        }
+    .popup-modal h1 {
+      font-size: 1.7rem;
+      line-height: 1.3;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+      word-break: break-word;
+      color: #3a1b2a;
+    }
 
-        .finCo p br {
-            display: block;
-            content: "";
-            margin-top: 0.8rem;
-        }
+    /* shakespeare-style P – same as before but with subtle glow */
+    .popup-modal p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #4d3642;
+      background: rgba(255, 240, 245, 0.5);
+      padding: 1.2rem 1.4rem;
+      border-radius: 2rem;
+      font-style: italic;
+      margin-top: 0.2rem;
+      border-left: 5px solid #e69fb4;
+      text-align: left;
+      width: 100%;
+      max-width: 100%;
+      word-break: break-word;
+      box-shadow: 0 4px 12px rgba(230, 159, 180, 0.1);
+    }
 
-        /* small screens: fine-tune */
-        @media (max-width: 480px) {
-            body {
-                padding: 1rem;
-                align-items: flex-start;
-                padding-top: 2rem;
-            }
+    .popup-modal p br {
+      display: block;
+      content: "";
+      margin-top: 0.8rem;
+    }
 
-            .finCo {
-                padding: 1.5rem 1.2rem;
-                border-radius: 2rem;
-                margin-top: 0;
-            }
+    /* small screens */
+    @media (max-width: 480px) {
+      body { padding: 1rem; align-items: flex-start; padding-top: 2rem; }
+      .popup-modal { padding: 1.5rem 1.2rem; border-radius: 2rem; }
+      .shr { width: 130px; height: 130px; }
+      .popup-modal h1 { font-size: 1.3rem; }
+      .popup-modal p { font-size: 0.9rem; padding: 1rem; border-left-width: 4px; }
+    }
 
-            .shr {
-                width: 140px;
-                height: 140px;
-                margin-bottom: 0.8rem;
-            }
+    @media (max-width: 380px) {
+      .popup-modal { padding: 1rem 0.8rem; border-radius: 1.8rem; }
+      .shr { width: 105px; height: 105px; }
+      .popup-modal h1 { font-size: 1.1rem; }
+      .popup-modal p { font-size: 0.8rem; padding: 0.8rem; }
+    }
 
-            .finCo h1 {
-                font-size: 1.3rem;
-            }
+    @media (min-width: 768px) {
+      .popup-modal { padding: 2.5rem 3rem; max-width: 700px; }
+      .shr { width: 200px; height: 200px; }
+      .popup-modal h1 { font-size: 2rem; }
+      .popup-modal p { font-size: 1.05rem; padding: 1.5rem; }
+    }
 
-            .finCo p {
-                font-size: 0.9rem;
-                padding: 1rem;
-                border-left-width: 3px;
-            }
-        }
+    @media (min-width: 1200px) {
+      .popup-modal { padding: 3rem 4rem; max-width: 800px; }
+      .shr { width: 220px; height: 220px; }
+      .popup-modal h1 { font-size: 2.3rem; }
+    }
 
-        @media (max-width: 380px) {
-            .finCo {
-                padding: 1.2rem 0.8rem;
-                border-radius: 1.8rem;
-            }
+    /* extra helper */
+    .popup-modal * { max-width: 100%; }
+    img { max-width: 100%; height: auto; border-radius: 12px; }
 
-            .shr {
-                width: 110px;
-                height: 110px;
-            }
+    /* subtle confetti canvas overlay (positioned fixed) */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
 
-            .finCo h1 {
-                font-size: 1.1rem;
-            }
-
-            .finCo p {
-                font-size: 0.8rem;
-                padding: 0.8rem;
-            }
-        }
-
-        /* large screens: keep it elegant */
-        @media (min-width: 768px) {
-            .finCo {
-                padding: 2.5rem 3rem;
-                max-width: 680px;
-            }
-
-            .shr {
-                width: 200px;
-                height: 200px;
-            }
-
-            .finCo h1 {
-                font-size: 1.9rem;
-            }
-
-            .finCo p {
-                font-size: 1.05rem;
-                padding: 1.5rem;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .finCo {
-                padding: 3rem 4rem;
-                max-width: 780px;
-            }
-
-            .shr {
-                width: 220px;
-                height: 220px;
-            }
-
-            .finCo h1 {
-                font-size: 2.2rem;
-            }
-        }
-
-        /* touch-friendly & accessibility */
-        button, input, select, .option {
-            touch-action: manipulation;
-        }
-
-        /* preserve other classes if they appear (just in case) */
-        .container, .yesCo, .askCo, .fdCo {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 32px;
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            color: #492230;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin: 0 auto;
-        }
-
-        /* but we only use .finCo – still define others for completeness */
-        a { text-decoration: none; }
-        img { max-width: 100%; height: auto; border-radius: 12px; }
-
-        #yes, #no, #ok, #submit, #ths {
-            background-color: #ff69b4;
-            border: none;
-            padding: 10px 20px;
-            margin: 10px;
-            border-radius: 35px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #492230;
-            transition: 0.2s;
-        }
-        #no { background-color: #CBC1E6; }
-        #ok { background-color: #E69FB4; }
-        #submit { background-color: #CE8DA0; width: 100%; }
-        .fdCo>#ths { background-color: #E69FB4; width: 100%; max-width: 298px; }
-
-        input[type="date"], select {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 34px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .select { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .option {
-            background-color: #DFDCE4;
-            border-radius: 14px;
-            padding: 10px 20px;
-            min-width: 50px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: border 0.3s;
-        }
-        .option:hover { border-color: #E69FB4; }
-        .finCo { height: auto; } /* override fixed height */
-        .finCo>p { font-style: italic; color: #4d3642; }
-        #date { width: 100%; }
-
-        /* hide potential overflow */
-        .finCo * { max-width: 100%; }
-    </style>
-
-    <!-- EmailJS library (kept) -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
-    </script>
+    /* preserve old classes just in case, but we use .popup-modal */
+    .finCo, .container, .yesCo, .askCo, .fdCo {
+      /* not used, but keep harmless */
+    }
+  </style>
 </head>
 <body>
-    <div class="finCo">
-        <img class="shr" src="./assets/6.jpeg" alt="us" />
-        <h1>glad you didn't say no. be ready by 6, I'm coming to get you 🚗</h1>
 
-        <!-- Shakespeare-style added message -->
-        <p>“You mean the absolute world to me,
-My favorite place I’d rather be.
-I cannot wait for our date,
-To hold your hand and spend time with you, la!"<br><br>
-            P.S normal people text. I made a website on Replit, during lunch for you no big deal.
-            
-        </p>
-    </div>
+  <!-- POPUP MODAL – final container -->
+  <div class="popup-modal" id="finalModal">
+    <img class="shr" src="./assets/6.jpeg" alt="us" />
+    <h1>glad you didn't say no. be ready by 6, I'm coming to get you 🚗</h1>
 
-    <script>
-        (function() {
-            emailjs.init("tFZ-0dnIVohcPBTzt"); // public key
-        })();
+    <!-- shakespeare-style message (exactly as provided) -->
+    <p>“You mean the absolute world to me,<br>
+    My favorite place I’d rather be.<br>
+    I cannot wait for our date,<br>
+    To hold your hand and spend time with you, la!"<br><br>
+    P.S normal people text. I made a website on Replit, during lunch for you no big deal.
+    </p>
+  </div>
 
-        // Get data from localStorage
-        const date = localStorage.getItem("date");
-        const time = localStorage.getItem("time");
+  <!-- hidden confetti canvas (overlay) -->
+  <canvas id="confetti-canvas"></canvas>
 
-        const templateParams = {
-            date: date || "Not specified",
-            time: time || "Not specified",
-            message: `Date Details:\n- Date: ${date || "Not specified"}\n- Time: ${time || "Not specified"}`
-        };
+  <script>
+    (function() {
+      // ---------- CONFETTI BURST ----------
+      // using canvas-confetti library (loaded via CDN)
+      // we want a big celebratory pop, then a few extra bursts
 
-        // Send email and clear storage
-        emailjs.send("service_3tno9xa", "template_gj61mxg", templateParams)
-            .then(function(response) {
-                console.log("SUCCESS!", response.status, response.text);
-                localStorage.clear();
-            }, function(error) {
-                console.log("FAILED...", error);
-                localStorage.clear();
-            });
-    </script>
+      function fireConfetti() {
+        // default burst
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          origin: { y: 0.6 },
+          startVelocity: 30,
+          colors: ['#ff6b9d', '#ffb3c6', '#ffd1dc', '#ff85a1', '#ff4d6d']
+        });
+
+        // second wave after a tiny delay (more dense)
+        setTimeout(() => {
+          confetti({
+            particleCount: 120,
+            spread: 100,
+            origin: { y: 0.5, x: 0.3 },
+            startVelocity: 25,
+            colors: ['#f7c5cc', '#f9a8b5', '#f28b9e', '#f5a3b9']
+          });
+        }, 150);
+
+        // third wave from right
+        setTimeout(() => {
+          confetti({
+            particleCount: 120,
+            spread: 100,
+            origin: { y: 0.5, x: 0.7 },
+            startVelocity: 25,
+            colors: ['#ffb3c6', '#ff99aa', '#ff7a99', '#f25c7e']
+          });
+        }, 300);
+
+        // fourth — big colorful sprinkle
+        setTimeout(() => {
+          confetti({
+            particleCount: 200,
+            spread: 120,
+            origin: { y: 0.4 },
+            startVelocity: 35,
+            colors: ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590']
+          });
+        }, 500);
+
+        // fifth: little extra sparkle (longer delay)
+        setTimeout(() => {
+          confetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { y: 0.7, x: 0.5 },
+            startVelocity: 20,
+            colors: ['#ffe66d', '#ffb347', '#ff6f61']
+          });
+        }, 800);
+      }
+
+      // also a continuous "rain" for 2 seconds? but burst is fine.
+      // trigger confetti on load + after a tiny delay for modal to appear
+      window.addEventListener('load', function() {
+        // initial burst
+        fireConfetti();
+
+        // extra bursts after 1.2s and 2.2s for more celebration
+        setTimeout(() => {
+          fireConfetti();
+        }, 1200);
+
+        setTimeout(() => {
+          confetti({
+            particleCount: 100,
+            spread: 90,
+            origin: { y: 0.3, x: 0.2 },
+            colors: ['#f9a8b5', '#f28b9e', '#f5a3b9', '#ff6b9d']
+          });
+        }, 2000);
+
+        // final big one at 3s
+        setTimeout(() => {
+          confetti({
+            particleCount: 180,
+            spread: 130,
+            origin: { y: 0.5 },
+            startVelocity: 30,
+            colors: ['#ffb3c6', '#ff85a1', '#ff4d6d', '#ffd1dc', '#ff99aa']
+          });
+        }, 3000);
+      });
+
+      // ---------- EMAILJS (unchanged) ----------
+      // init EmailJS
+      (function() {
+        emailjs.init("tFZ-0dnIVohcPBTzt"); // public key
+      })();
+
+      // get data from localStorage
+      const date = localStorage.getItem("date");
+      const time = localStorage.getItem("time");
+
+      const templateParams = {
+        date: date || "Not specified",
+        time: time || "Not specified",
+        message: `Date Details:\n- Date: ${date || "Not specified"}\n- Time: ${time || "Not specified"}`
+      };
+
+      // send email and clear storage
+      emailjs.send("service_3tno9xa", "template_gj61mxg", templateParams)
+        .then(function(response) {
+          console.log("SUCCESS!", response.status, response.text);
+          localStorage.clear();
+        }, function(error) {
+          console.log("FAILED...", error);
+          localStorage.clear();
+        });
+
+      // (optional) if you want to trigger extra confetti on click/tap the modal – just for fun
+      const modal = document.getElementById('finalModal');
+      if (modal) {
+        modal.addEventListener('click', function(e) {
+          // small pop on click
+          confetti({
+            particleCount: 40,
+            spread: 50,
+            origin: { y: 0.6 }
+          });
+        });
+      }
+
+    })();
+  </script>
+
+  <!-- emailjs library (kept) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+  </script>
 </body>
 </html>

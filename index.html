@@ -70,12 +70,12 @@
     .carousel {
       position: relative;
       width: 100%;
-      max-width: 440px;  /* generous but fits mobile */
-      aspect-ratio: 1 / 1; /* square = perfectly balanced */
+      max-width: 440px;
+      aspect-ratio: 1 / 1;
       overflow: hidden;
       border-radius: 32px;
       box-shadow: 0 12px 28px rgba(73, 34, 48, 0.15);
-      background: #f5e6ed; /* soft placeholder */
+      background: #f5e6ed;
     }
 
     .carousel-slides {
@@ -94,17 +94,47 @@
       align-items: center;
       justify-content: center;
       background: #f5e6ed;
+      overflow: hidden; /* critical for containing images */
+      position: relative;
     }
 
     .slide img {
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover;       /* fills square without distortion */
-      aspect-ratio: 1 / 1;     /* explicit square */
-      margin: 0;
-      border-radius: 0;
+      object-fit: cover;
+      /* Remove aspect-ratio to let object-fit handle it */
+      /* Use min/max to contain within slide */
+      min-width: 100%;
+      min-height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      flex-shrink: 0;
+      flex-grow: 0;
       background: #faf0f5;
+      /* Safari-specific fixes */
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      image-rendering: auto;
+    }
+
+    /* iOS Safari specific fix */
+    @supports (-webkit-touch-callout: none) {
+      .slide {
+        /* Force proper containment on iOS */
+        min-height: 0;
+        min-width: 0;
+      }
+      .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* Prevent overflow on iOS */
+        max-width: 100%;
+        max-height: 100%;
+        min-width: 0;
+        min-height: 0;
+      }
     }
 
     /* navigation – always visible, balanced */
@@ -316,14 +346,12 @@
       const maxY = window.innerHeight - noBtn.offsetHeight - 20;
       noBtn.style.left = Math.max(0, Math.random() * maxX) + "px";
       noBtn.style.top = Math.max(0, Math.random() * maxY) + "px";
-      // bring to front
       noBtn.style.zIndex = "999";
       noBtn.style.transition = "left 0.15s, top 0.15s";
     }
     if (noBtn) {
       noBtn.addEventListener("mouseenter", moveButton);
       noBtn.addEventListener("touchstart", moveButton, { passive: true });
-      // also on click to keep it funny
       noBtn.addEventListener("click", moveButton);
     }
 
@@ -362,7 +390,6 @@
         if (index >= totalSlides) index = 0;
         currentSlide = index;
         slidesContainer.style.transform = `translateX(-${index * 100}%)`;
-        // update dots
         dots.forEach(d => d.classList.remove('active'));
         if (dots[index]) dots[index].classList.add('active');
       }
@@ -397,7 +424,6 @@
         startAutoPlay();
       }
 
-      // pause on hover / touch
       const carousel = document.querySelector('.carousel');
       if (carousel) {
         carousel.addEventListener('mouseenter', function() {
@@ -406,7 +432,6 @@
         carousel.addEventListener('mouseleave', function() {
           startAutoPlay();
         });
-        // also pause on touchstart (mobile)
         carousel.addEventListener('touchstart', function() {
           clearInterval(autoPlayInterval);
         }, { passive: true });
@@ -415,7 +440,6 @@
         }, { passive: true });
       }
 
-      // keyboard arrows
       document.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowLeft') {
           prevSlide();
@@ -428,18 +452,19 @@
         }
       });
 
-      // --- start autoplay ---
       startAutoPlay();
-
-      // --- edge: if window resizes, no need to recalc — slides use % ---
-      // also ensure first slide is active (in case of late load)
       goToSlide(0);
 
-      // optional: re-trigger on orientation change
       window.addEventListener('orientationchange', function() {
-        // just ensure transform is correct
         goToSlide(currentSlide);
       });
+
+      // iOS Safari additional fix: force reflow after load
+      if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+        setTimeout(function() {
+          goToSlide(currentSlide);
+        }, 100);
+      }
     });
   })();
 </script>

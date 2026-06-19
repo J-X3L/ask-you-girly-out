@@ -1,37 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="index.css">
-    <script src="index.js" defer></script>
-    <title>home</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>home · carousel balanced · responsive</title>
+  <style>
+    /* === reset & global === */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(253, 215, 215, 0.3);
+      background-image: url('./assets/petals2.gif');
+      background-size: cover;
+      background-position: center;
+      background-blend-mode: overlay;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-color: rgba(253, 215, 215, 0.6);
+      backdrop-filter: blur(1px);
+    }
+
+    /* main card – fluid & balanced */
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(6px);
+      padding: 28px 20px 30px;
+      border-radius: 40px;
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(230, 159, 180, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: #492230;
+      transition: all 0.2s;
+    }
+
+    h1 {
+      font-size: clamp(1.4rem, 5vw, 2rem);
+      margin: 0.5rem 0 0.8rem;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      color: #492230;
+      text-shadow: 0 1px 4px rgba(230, 159, 180, 0.2);
+    }
+
+    /* === CAROUSEL – fully responsive, balanced, crisp === */
+    .carousel-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 0 4px;
+    }
+
+    .carousel {
+      position: relative;
+      width: 100%;
+      max-width: 440px;  /* generous but fits mobile */
+      aspect-ratio: 1 / 1; /* square = perfectly balanced */
+      overflow: hidden;
+      border-radius: 32px;
+      box-shadow: 0 12px 28px rgba(73, 34, 48, 0.15);
+      background: #f5e6ed; /* soft placeholder */
+    }
+
+    .carousel-slides {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+    }
+
+    .slide {
+      min-width: 100%;
+      height: 100%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f5e6ed;
+    }
+
+    .slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;       /* fills square without distortion */
+      aspect-ratio: 1 / 1;     /* explicit square */
+      margin: 0;
+      border-radius: 0;
+      background: #faf0f5;
+    }
+
+    /* navigation – always visible, balanced */
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      border: none;
+      font-size: 2rem;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 48px;
+      cursor: pointer;
+      color: #492230;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.2s ease;
+      line-height: 1;
+      font-weight: 300;
+      z-index: 10;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .carousel-btn:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-50%) scale(1.04);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+    .carousel-btn:active {
+      transform: translateY(-50%) scale(0.94);
+    }
+
+    .prev-btn { left: 12px; }
+    .next-btn { right: 12px; }
+
+    /* dots – clean and balanced */
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin: 18px 0 6px 0;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 40px;
+      background: #d9c5d0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .dot.active {
+      background: #E69FB4;
+      width: 32px;
+      box-shadow: 0 2px 10px rgba(230, 159, 180, 0.6);
+      border-color: #e08ba5;
+    }
+
+    .dot:hover {
+      background: #cfa1b5;
+      transform: scale(1.15);
+    }
+
+    /* buttons (yes/no) */
+    .btn {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin: 8px 0 4px;
+    }
+
+    #yes {
+      background-color: #ff69b4;
+      text-transform: uppercase;
+      color: #492230;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+      transition: all 0.15s;
+    }
+    #yes:hover {
+      transform: scale(1.02);
+      background: #ff7ebd;
+    }
+
+    #no {
+      background-color: #CBC1E6;
+      text-transform: lowercase;
+      color: #492230;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    #no:hover {
+      background: #b8acd6;
+    }
+
+    /* responsive fine-tuning */
+    @media (max-width: 500px) {
+      .container {
+        padding: 20px 14px 24px;
+        border-radius: 32px;
+      }
+      .carousel {
+        border-radius: 24px;
+        max-width: 100%;
+      }
+      .carousel-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 1.6rem;
+      }
+      .prev-btn { left: 8px; }
+      .next-btn { right: 8px; }
+      .dot {
+        width: 10px;
+        height: 10px;
+      }
+      .dot.active {
+        width: 26px;
+      }
+      #yes, #no {
+        padding: 10px 22px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .container {
+        padding: 16px 10px 20px;
+      }
+      .carousel-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1.4rem;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+      }
+      .dot.active {
+        width: 22px;
+      }
+    }
+
+    /* preserve original small-card elements – not used but kept */
+    .yesCo, .askCo, .fdCo, .finCo { display: none; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <img src="./assets/caty.gif" />
-        <h1>🌸 Will you go on a date with me? 🌸</h1>
-        <div class="btn">
-            <a href="yes.html">
-                <button id="yes">Yes 💞</button>
-            </a>
-            <button id="no">No 🙈</button>
-        </div>
+<div class="container">
+  <div class="carousel-container">
+    <div class="carousel">
+      <div class="carousel-slides">
+        <div class="slide"><img src="./assets/1.jpeg" alt="Memory 1" loading="lazy"/></div>
+        <div class="slide"><img src="./assets/2.jpeg" alt="Memory 2" loading="lazy"/></div>
+        <div class="slide"><img src="./assets/3.jpeg" alt="Memory 3" loading="lazy"/></div>
+        <div class="slide"><img src="./assets/4.jpeg" alt="Memory 4" loading="lazy"/></div>
+        <div class="slide"><img src="./assets/5.jpeg" alt="Memory 5" loading="lazy"/></div>
+        <div class="slide"><img src="./assets/6.jpeg" alt="Memory 6" loading="lazy"/></div>
+        <div class="slide"><img src="./assets/7.jpeg" alt="Memory 7" loading="lazy"/></div>
+      </div>
+
+      <button class="carousel-btn prev-btn" aria-label="previous slide">❮</button>
+      <button class="carousel-btn next-btn" aria-label="next slide">❯</button>
+      <div class="carousel-dots"></div>
     </div>
+  </div>
 
-    <script>
-       const noBtn = document.getElementById("no");
+  <h1>🌸 Will you go on a date with me? 🌸</h1>
+  <div class="btn">
+    <a href="yes.html" style="display: inline-block;">
+      <button id="yes">Yes 💞</button>
+    </a>
+    <button id="no">No 🙈</button>
+  </div>
+</div>
 
-function moveButton() {
-    noBtn.style.position = "fixed";
-    noBtn.style.left =
-        Math.random() * (window.innerWidth - noBtn.offsetWidth) + "px";
-    noBtn.style.top =
-        Math.random() * (window.innerHeight - noBtn.offsetHeight) + "px";
-}
+<script>
+  (function() {
+    "use strict";
 
-noBtn.addEventListener("mouseenter", moveButton);
-noBtn.addEventListener("touchstart", moveButton);
-    </script>
+    // ===== NO BUTTON – original playful logic =====
+    const noBtn = document.getElementById("no");
+    function moveButton() {
+      if (!noBtn) return;
+      noBtn.style.position = "fixed";
+      const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+      const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+      noBtn.style.left = Math.max(0, Math.random() * maxX) + "px";
+      noBtn.style.top = Math.max(0, Math.random() * maxY) + "px";
+      // bring to front
+      noBtn.style.zIndex = "999";
+      noBtn.style.transition = "left 0.15s, top 0.15s";
+    }
+    if (noBtn) {
+      noBtn.addEventListener("mouseenter", moveButton);
+      noBtn.addEventListener("touchstart", moveButton, { passive: true });
+      // also on click to keep it funny
+      noBtn.addEventListener("click", moveButton);
+    }
+
+    // ===== CAROUSEL – fully responsive, balanced, autoplay =====
+    document.addEventListener('DOMContentLoaded', function() {
+      const slidesContainer = document.querySelector('.carousel-slides');
+      const slides = document.querySelectorAll('.slide');
+      const dotsContainer = document.querySelector('.carousel-dots');
+      const prevBtn = document.querySelector('.prev-btn');
+      const nextBtn = document.querySelector('.next-btn');
+      if (!slidesContainer || !slides.length) return;
+
+      let currentSlide = 0;
+      let autoPlayInterval = null;
+      const totalSlides = slides.length;
+
+      // --- create dots ---
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dot.setAttribute('data-index', i);
+        dot.addEventListener('click', function(e) {
+          const idx = parseInt(this.dataset.index, 10);
+          goToSlide(idx);
+          resetAutoPlay();
+        });
+        dotsContainer.appendChild(dot);
+      }
+      const dots = document.querySelectorAll('.dot');
+
+      // --- core slide function ---
+      function goToSlide(index) {
+        if (index < 0) index = totalSlides - 1;
+        if (index >= totalSlides) index = 0;
+        currentSlide = index;
+        slidesContainer.style.transform = `translateX(-${index * 100}%)`;
+        // update dots
+        dots.forEach(d => d.classList.remove('active'));
+        if (dots[index]) dots[index].classList.add('active');
+      }
+
+      // --- navigation ---
+      function nextSlide() {
+        goToSlide(currentSlide + 1);
+      }
+      function prevSlide() {
+        goToSlide(currentSlide - 1);
+      }
+
+      if (prevBtn) prevBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        prevSlide();
+        resetAutoPlay();
+      });
+      if (nextBtn) nextBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        nextSlide();
+        resetAutoPlay();
+      });
+
+      // --- autoplay & pause ---
+      function startAutoPlay() {
+        if (autoPlayInterval) clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(nextSlide, 3500);
+      }
+
+      function resetAutoPlay() {
+        clearInterval(autoPlayInterval);
+        startAutoPlay();
+      }
+
+      // pause on hover / touch
+      const carousel = document.querySelector('.carousel');
+      if (carousel) {
+        carousel.addEventListener('mouseenter', function() {
+          clearInterval(autoPlayInterval);
+        });
+        carousel.addEventListener('mouseleave', function() {
+          startAutoPlay();
+        });
+        // also pause on touchstart (mobile)
+        carousel.addEventListener('touchstart', function() {
+          clearInterval(autoPlayInterval);
+        }, { passive: true });
+        carousel.addEventListener('touchend', function() {
+          startAutoPlay();
+        }, { passive: true });
+      }
+
+      // keyboard arrows
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') {
+          prevSlide();
+          resetAutoPlay();
+          e.preventDefault();
+        } else if (e.key === 'ArrowRight') {
+          nextSlide();
+          resetAutoPlay();
+          e.preventDefault();
+        }
+      });
+
+      // --- start autoplay ---
+      startAutoPlay();
+
+      // --- edge: if window resizes, no need to recalc — slides use % ---
+      // also ensure first slide is active (in case of late load)
+      goToSlide(0);
+
+      // optional: re-trigger on orientation change
+      window.addEventListener('orientationchange', function() {
+        // just ensure transform is correct
+        goToSlide(currentSlide);
+      });
+    });
+  })();
+</script>
 </body>
 </html>

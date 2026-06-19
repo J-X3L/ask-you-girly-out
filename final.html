@@ -22,17 +22,16 @@
         // Get all data from localStorage
         const date = localStorage.getItem("date");
         const time = localStorage.getItem("time");
-        //const food = localStorage.getItem("food");
+
 
         // Prepare the email data
         const templateParams = {
             date: date || "Not specified",
             time: time || "Not specified",
-            //food: food || "Not specified",
             message: `Date Details:
             - Date: ${date || "Not specified"}
             - Time: ${time || "Not specified"}
-            - Food Choice: ${food || "Not specified"}`
+`
         };
 
         // Send the email

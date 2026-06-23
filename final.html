@@ -6,6 +6,9 @@
   <title>popup · confetti · final</title>
   <!-- canvas confetti library (lightweight) -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+  <!-- emailjs library - MOVED TO HEAD for earlier loading -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+  </script>
   <style>
     * {
       margin: 0;
@@ -171,7 +174,7 @@
 
     <!-- shakespeare-style message (exactly as provided) -->
     <p>“You mean the absolute world to me,<br>
-    My favorite place I’d rather be.<br>
+    My favorite place I'd rather be.<br>
     I cannot wait for our date,<br>
     To hold your hand and spend time with you, la!"<br><br>
     P.S normal people text. I made a website on Replit, during lunch for you no big deal.
@@ -274,31 +277,48 @@
         }, 3000);
       });
 
-      // ---------- EMAILJS (unchanged) ----------
-      // init EmailJS
-      (function() {
-        emailjs.init("tFZ-0dnIVohcPBTzt"); // public key
-      })();
+      // ---------- EMAILJS (FIXED) ----------
+      // Wait for EmailJS to be fully loaded before using it
+      function sendEmailWithRetry() {
+        try {
+          // Check if emailjs is available
+          if (typeof emailjs === 'undefined') {
+            console.log('EmailJS not loaded yet, retrying in 500ms...');
+            setTimeout(sendEmailWithRetry, 500);
+            return;
+          }
 
-      // get data from localStorage
-      const date = localStorage.getItem("date");
-      const time = localStorage.getItem("time");
+          // Initialize EmailJS
+          emailjs.init("tFZ-0dnIVohcPBTzt"); // public key
 
-      const templateParams = {
-        date: date || "Not specified",
-        time: time || "Not specified",
-        message: `Date Details:\n- Date: ${date || "Not specified"}\n- Time: ${time || "Not specified"}`
-      };
+          // get data from localStorage
+          const date = localStorage.getItem("date");
+          const time = localStorage.getItem("time");
 
-      // send email and clear storage
-      emailjs.send("service_3tno9xa", "template_gj61mxg", templateParams)
-        .then(function(response) {
-          console.log("SUCCESS!", response.status, response.text);
-          localStorage.clear();
-        }, function(error) {
-          console.log("FAILED...", error);
-          localStorage.clear();
-        });
+          const templateParams = {
+            date: date || "Not specified",
+            time: time || "Not specified",
+            message: `Date Details:\n- Date: ${date || "Not specified"}\n- Time: ${time || "Not specified"}`
+          };
+
+          // send email and clear storage
+          emailjs.send("service_3tno9xa", "template_gj61mxg", templateParams)
+            .then(function(response) {
+              console.log("SUCCESS! Email sent!", response.status, response.text);
+              localStorage.clear();
+            }, function(error) {
+              console.log("FAILED to send email...", error);
+              localStorage.clear();
+            });
+        } catch (error) {
+          console.log('Error in email sending:', error);
+          // Try again after a delay
+          setTimeout(sendEmailWithRetry, 1000);
+        }
+      }
+
+      // Start the email sending process after a small delay to ensure everything is loaded
+      setTimeout(sendEmailWithRetry, 1000);
 
       // (optional) if you want to trigger extra confetti on click/tap the modal – just for fun
       const modal = document.getElementById('finalModal');
@@ -314,10 +334,6 @@
       }
 
     })();
-  </script>
-
-  <!-- emailjs library (kept) -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
   </script>
 </body>
 </html>
